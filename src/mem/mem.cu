@@ -182,16 +182,14 @@ void MemManager::PreferGPU() {
              "device ",
              device,
              "; continuing without GPU-preferred memory. Error: ",
-             cudaGetErrorString(advise_error));
+             cudaGetErrorString(error));
         warned = true;
       }
-      cudaGetLastError();
       return;
     }
-    if (advise_error != cudaSuccess) {
-      const char* error_string = cudaGetErrorString(advise_error);
-      printf("%s:%d: (%d) %s\n", __FILE__, __LINE__, advise_error,
-             error_string);
+    if (error != cudaSuccess) {
+      const char* error_string = cudaGetErrorString(error);
+      printf("%s:%d: (%d) %s\n", __FILE__, __LINE__, error, error_string);
       throw std::runtime_error(error_string);
     }
   }
