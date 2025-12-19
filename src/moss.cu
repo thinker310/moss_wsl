@@ -152,10 +152,10 @@ void Moss::Step() {
     lane.UpdateAsync();
     person.UpdateAsync();
     junction.UpdateAsync();
-    // write output into file
-    step_output.Write(time, person.outputs, lane.outputs);
     CUCHECK(cudaDeviceSynchronize());
     CHECK_ERROR;
+    // write output into file
+    step_output.Write(time, person.outputs, lane.outputs);
   }
   ++step;
   time = step * config.step_interval;

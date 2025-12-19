@@ -167,12 +167,33 @@ void MemManager::PreferCPU() {
 }
 
 void MemManager::PreferGPU() {
+  bool warned = false;
   for (auto& block : blocks) {
     CUCHECK(cudaMemAdvise(block.ptr, block.size,
                           cudaMemAdviseUnsetPreferredLocation,
                           cudaCpuDeviceId));
-    CUCHECK(cudaMemAdvise(block.ptr, block.size,
-                          cudaMemAdviseSetPreferredLocation, device));
+    cudaError_t advise_error =
+        cudaMemAdvise(block.ptr, block.size,
+                      cudaMemAdviseSetPreferredLocation, device);
+    if (advise_error == cudaErrorInvalidDevice ||
+        advise_error == cudaErrorNotSupported) {
+      if (!warned) {
+        Warn("MemManager: cudaMemAdviseSetPreferredLocation not supported for "
+             "device ",
+             device,
+             "; continuing without GPU-preferred memory. Error: ",
+             cudaGetErrorString(advise_error));
+        warned = true;
+      }
+      cudaGetLastError();
+      return;
+    }
+    if (advise_error != cudaSuccess) {
+      const char* error_string = cudaGetErrorString(advise_error);
+      printf("%s:%d: (%d) %s\n", __FILE__, __LINE__, advise_error,
+             error_string);
+      throw std::runtime_error(error_string);
+    }
   }
 }
 
