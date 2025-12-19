@@ -172,10 +172,11 @@ void MemManager::PreferGPU() {
     CUCHECK(cudaMemAdvise(block.ptr, block.size,
                           cudaMemAdviseUnsetPreferredLocation,
                           cudaCpuDeviceId));
-    cudaError_t error =
+    cudaError_t advise_error =
         cudaMemAdvise(block.ptr, block.size,
                       cudaMemAdviseSetPreferredLocation, device);
-    if (error == cudaErrorInvalidDevice || error == cudaErrorNotSupported) {
+    if (advise_error == cudaErrorInvalidDevice ||
+        advise_error == cudaErrorNotSupported) {
       if (!warned) {
         Warn("MemManager: cudaMemAdviseSetPreferredLocation not supported for "
              "device ",
