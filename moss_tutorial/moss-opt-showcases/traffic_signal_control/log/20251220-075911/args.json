@@ -1,0 +1,1 @@
+{"data": "data/sumo_sz", "steps": 3600, "interval": 30, "training_step": 20000, "training_start": 2000, "training_freq": 10, "target_freq": 100, "gamma": 0.99, "batchsize": 1024, "buffer_size": 4096, "lr": 1e-05, "cuda": 0, "mlp": "256,256"}
